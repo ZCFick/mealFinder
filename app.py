@@ -33,6 +33,8 @@ def recipe(meal_id):
     
     meal = raw_data[0]
 
+    print(raw_data)
+    
     ingredients = []
     for i in range(1, 21):
         ing = meal.get(f"strIngredient{i}")

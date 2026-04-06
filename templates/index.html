@@ -2,27 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meal Searcher</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>The MealDB Finder</title>
+  <link rel="stylesheet" href="../static/style.css">
 </head>
-<div id="recipe-modal" class="modal-hidden">
+
+<body>
+  <div id="recipe-modal" class="modal-hidden">
   
-  <div class="modal-content">
-    <span id="close-button" onclick="closeModal()">&times;</span>
-    
-    <div id="modal-body">
+    <div class="modal-content">
+      
+      <div id="modal-body">
+      </div>
+
     </div>
 
-    <button id="add-to-calendar">Add to Calendar</button>
   </div>
 
-</div>
-<body>
+  <h1>The MealDB Finder</h1>
 
-  <h1>Meal Searcher</h1>
-
-  <input type="text" id="ingredient" placeholder="Search a main ingredient">
-  <button onclick="search()">Search</button>
+  <form id="search-form" onsubmit="event.preventDefault(); search();">
+    <input type="text" id="ingredient" placeholder="Search a main ingredient">
+    <button type="submit">Search</button>
+  </form> 
 
   <div id="results"></div>
 
@@ -55,8 +56,10 @@
         results.innerHTML += `
         <div class="mealCard">
           <img src="${image}" alt="Image not avaliable">
-          <h3>${name}</h3>
-          <button onclick="openRecipe(${id})">View Recipe</button>
+          <div class="cardContent">
+            <h3>${name}</h3>
+            <button onclick="openRecipe(${id})">View Recipe</button>
+          <div>
         </div>
         `
 
@@ -66,7 +69,35 @@
     async function openRecipe(id) {
       const res = await fetch(`/recipe/${id}`)
       const data = await res.json()
-      console.log(data)
+      
+      let ing = ""
+
+      data.ingredients.forEach(ingred => {
+        ing += ingred + '<br>'
+      });
+
+      const body = document.getElementById("modal-body")
+      body.innerHTML = ""
+      body.innerHTML += `
+      <span id="close-button" onclick="closeModal()">&times;</span>
+      <img src=${data.image} alt="Image Not Avaliable" class="modal-image">
+      <h2>${data.name} (${data.location})</h2>
+      <h3>Ingedient List</h3>
+      <p>${ing}</p>
+      <h3>Instructions</h3>
+      <p>${data.instructions}</p>
+      <button id="add-to-calendar">Add to Calendar</button>
+      `
+
+      const modal = document.getElementById("recipe-modal")
+
+      modal.style.display = 'flex'
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("recipe-modal");
+    
+      modal.style.display = 'none';
     }
   </script>
 
