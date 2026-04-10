@@ -59,6 +59,7 @@
           <div class="cardContent">
             <h3>${name}</h3>
             <button onclick="openRecipe(${id})">View Recipe</button>
+            <button aria-pressed="false" onclick="favorite(this,${id})">&#9734</button>
           <div>
         </div>
         `
@@ -86,7 +87,7 @@
       <p>${ing}</p>
       <h3>Instructions</h3>
       <p>${data.instructions}</p>
-      <button id="add-to-calendar">Add to Calendar</button>
+      <button id="make-favorite">Favorite</button>
       `
 
       const modal = document.getElementById("recipe-modal")
@@ -98,6 +99,32 @@
       const modal = document.getElementById("recipe-modal");
     
       modal.style.display = 'none';
+    }
+
+    function favorite(btn, id) {
+      const isPressed = btn.getAttribute('aria-pressed') === 'true';
+      if (isPressed) {
+          removeFromFavorites(id);
+      } else {
+          addToFavorites(id);
+      }
+
+      document.getElementById("favorite").setAttribute('aria-pressed', !isPressed);
+    }
+
+    function addToFavorites(id) {
+      const favs = JSON.parse(localStorage.getItem("favorites")) || []
+      favs.push(id)
+      console.log(favs)
+      localStorage.setItem("favorites", JSON.stringify(favs))
+    }
+
+    function removeFromFavorites(id) {
+      const favs = JSON.parse(localStorage.getItem("favorites")) || []
+      const updated = favs.filter(ids => ids !== id)
+      
+      console.log(updated)
+      localStorage.setItem("favorites", JSON.stringify(updated))
     }
   </script>
 
