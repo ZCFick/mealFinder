@@ -42,6 +42,8 @@
       const results = document.getElementById("results")
       results.innerHTML = ""
       const meals = data.meals
+      const favs = JSON.parse(localStorage.getItem("favorites")) || []
+
 
       if (!meals) {
         results.innerHTML = "<p3>No recipes found. Try another ingredient!</p3>";
@@ -52,15 +54,20 @@
         const name = meal.strMeal
         const image = meal.strMealThumb
         const id = meal.idMeal
-
+        console.log(typeof id, id)
+        console.log(typeof favs[0], favs[0])
+        console.log(favs.includes(id))
+        const ap = favs.includes(id)
         results.innerHTML += `
         <div class="mealCard">
           <img src="${image}" alt="Image not avaliable">
           <div class="cardContent">
-            <h3>${name}</h3>
+            <div class="title-row">
+              <h3>${name}</h3>
+              <button aria-pressed="${ap}" onclick="favorite(this,${id})"></button>
+            </div>
             <button onclick="openRecipe(${id})">View Recipe</button>
-            <button aria-pressed="false" onclick="favorite(this,${id})">&#9734</button>
-          <div>
+          </div>
         </div>
         `
 
@@ -109,19 +116,19 @@
           addToFavorites(id);
       }
 
-      document.getElementById("favorite").setAttribute('aria-pressed', !isPressed);
+      btn.setAttribute('aria-pressed', !isPressed);
     }
 
     function addToFavorites(id) {
       const favs = JSON.parse(localStorage.getItem("favorites")) || []
-      favs.push(id)
+      favs.push(id.toString())
       console.log(favs)
       localStorage.setItem("favorites", JSON.stringify(favs))
     }
 
     function removeFromFavorites(id) {
       const favs = JSON.parse(localStorage.getItem("favorites")) || []
-      const updated = favs.filter(ids => ids !== id)
+      const updated = favs.filter(ids => ids !== id.toString())
       
       console.log(updated)
       localStorage.setItem("favorites", JSON.stringify(updated))

@@ -77,6 +77,13 @@ input, button {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.title-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
 .cardContent button {
     align-self: flex-start;
     width: 20%;
@@ -84,4 +91,26 @@ input, button {
 
 .mealCard img {
     border-radius: 12px;
+}
+
+.title-row button[aria-pressed] {
+    padding: 5px;
+    width: auto;
+    background: none;
+    border: none;
+    align-self: center;
+}
+
+button[aria-pressed="false"]::before {
+  content: '☆';
+  color: gray;
+  font-size: 24px;
+  background: none;
+  border: none;
+}
+
+button[aria-pressed="true"]::before {
+  content: '★';
+  color: gold;
+  font-size: 24px;
 }
