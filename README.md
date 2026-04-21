@@ -5,11 +5,11 @@ A lightweight Flask web app that lets you discover recipes by ingredient. Search
 ---
 
 ## Features
-
-- **Ingredient search** — type any main ingredient and get a grid of matching meals
-- **Meal cards** — each result displays the dish name, thumbnail image, and a "View Recipe" button
-- **Recipe modal** — click a meal to open a full recipe overlay with ingredients, step-by-step instructions, and cuisine origin
-- **JSON API** — clean Flask endpoints that can be consumed by any frontend
+- **Ingredient search** — type any main ingredient and get matching meals
+- **Meal cards** — each result includes title, image, and actions
+- **Recipe modal** — view ingredients, instructions, origin, and image
+- **Favorites page** — save/remove meals using LocalStorage
+- **Flask JSON API** — backend endpoints consumed by the frontend
 
 ---
 
@@ -19,21 +19,25 @@ A lightweight Flask web app that lets you discover recipes by ingredient. Search
 |-------|------------|
 | Backend | Python 3, Flask |
 | HTTP Client | Requests |
-| Data Source | TheMealDB API (free tier) |
+| Data Source | TheMealDB API |
 | Frontend | Vanilla HTML, CSS, JavaScript |
+| Storage | Browser LocalStorage (favorites) |
 
 ---
 
 ## Project Structure
-
-```
+```text
 mealPlanner/
-├── app.py               # Flask app — routes and API logic
+├── app.py                    # Flask routes and API proxy logic
+├── requirements.txt          # Python dependencies
 ├── templates/
-│   └── index.html       # Search UI, meal cards, and recipe modal
+│   ├── index.html            # Search page + modal container
+│   └── favorites.html        # Favorites page UI and client rendering
 ├── static/
-│   └── style.css        # Stylesheet
-├── venv/                # Python virtual environment
+│   ├── style.css             # App styling
+│   └── utils.js              # Shared client utilities (favorites + modal)
+├── __pycache__/              # Python bytecode cache
+├── venv/                     # Local virtual environment
 └── README.md
 ```
 
@@ -95,7 +99,6 @@ Returns full recipe detail for a given meal ID.
 
 ## Planned Improvements
 
-- Favourite / saved meals list
-- Stored calendar functionality
+- Weekly calendar functionality
 - Error handling and user-facing error messages
 - Mobile-responsive layout
