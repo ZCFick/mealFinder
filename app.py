@@ -9,6 +9,10 @@ MEALDB_BASE = "https://www.themealdb.com/api/json/v1/1"
 def home():
     return render_template("index.html")
 
+@app.route("/favorites")
+def favorites_page():
+    return render_template("favorites.html")
+
 @app.route("/search/<ingredient>")
 def search(ingredient):
 

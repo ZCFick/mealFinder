@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <title>The MealDB Finder</title>
-  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
+  <nav class="top-nav">
+    <a href="{{ url_for('home') }}">Search</a>
+    <a href="{{ url_for('favorites_page') }}">Favorites</a>
+  </nav>
   <div id="recipe-modal" class="modal-hidden">
   
     <div class="modal-content">
@@ -27,111 +31,71 @@
 
   <div id="results"></div>
 
+  <script src="{{ url_for('static', filename='utils.js') }}"></script>
   <script>
     async function search() {
       const input = document.getElementById("ingredient").value;
 
-      const res = await fetch(`/search/${input}`)
+      const res = await fetch(`/search/${input}`);
       
-      const data = await res.json()
+      const data = await res.json();
 
-      renderCards(data)
+      renderCards(data);
     }
 
     function renderCards(data) {
-      const results = document.getElementById("results")
-      results.innerHTML = ""
-      const meals = data.meals
-      const favs = JSON.parse(localStorage.getItem("favorites")) || []
+      const results = document.getElementById("results");
+      results.replaceChildren();
+      const meals = data.meals;
+      const favs = JSON.parse(localStorage.getItem("favorites")) || [];
 
 
       if (!meals) {
-        results.innerHTML = "<p3>No recipes found. Try another ingredient!</p3>";
+        const error = document.createElement("h3");
+        error.textContent = "No recipes found. Try another ingredient!";
+        results.appendChild(error);
         return;
       }
 
       meals.forEach(meal => {
-        const name = meal.strMeal
-        const image = meal.strMealThumb
-        const id = meal.idMeal
-        console.log(typeof id, id)
-        console.log(typeof favs[0], favs[0])
-        console.log(favs.includes(id))
-        const ap = favs.includes(id)
-        results.innerHTML += `
-        <div class="mealCard">
-          <img src="${image}" alt="Image not avaliable">
-          <div class="cardContent">
-            <div class="title-row">
-              <h3>${name}</h3>
-              <button aria-pressed="${ap}" onclick="favorite(this,${id})"></button>
-            </div>
-            <button onclick="openRecipe(${id})">View Recipe</button>
-          </div>
-        </div>
-        `
+        const name = meal.strMeal;
+        const image = meal.strMealThumb;
+        const id = meal.idMeal;
+        const ap = favs.includes(id);
+        const card = document.createElement("div");
+        card.className = "mealCard";
+
+        const img = document.createElement("img");
+        img.src = image;
+        img.alt = "Image not available";
+
+        const cardContent = document.createElement("div");
+        cardContent.className = "cardContent";
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "title-row";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = name;
+
+        const btn = document.createElement("button");
+        btn.setAttribute("aria-pressed", ap);
+        btn.addEventListener("click", () => favorite(btn, id));
+
+        const btn2 = document.createElement("button");
+        btn2.addEventListener("click", () => openRecipe(id))
+        btn2.textContent = "View Recipe"
+
+        titleRow.appendChild(h3);
+        titleRow.appendChild(btn);
+        cardContent.appendChild(titleRow);
+        cardContent.appendChild(btn2)
+        card.appendChild(img);
+        card.appendChild(cardContent);
+
+        results.appendChild(card);
 
       });
-    }
-
-    async function openRecipe(id) {
-      const res = await fetch(`/recipe/${id}`)
-      const data = await res.json()
-      
-      let ing = ""
-
-      data.ingredients.forEach(ingred => {
-        ing += ingred + '<br>'
-      });
-
-      const body = document.getElementById("modal-body")
-      body.innerHTML = ""
-      body.innerHTML += `
-      <span id="close-button" onclick="closeModal()">&times;</span>
-      <img src=${data.image} alt="Image Not Avaliable" class="modal-image">
-      <h2>${data.name} (${data.location})</h2>
-      <h3>Ingedient List</h3>
-      <p>${ing}</p>
-      <h3>Instructions</h3>
-      <p>${data.instructions}</p>
-      <button id="make-favorite">Favorite</button>
-      `
-
-      const modal = document.getElementById("recipe-modal")
-
-      modal.style.display = 'flex'
-    }
-
-    function closeModal() {
-      const modal = document.getElementById("recipe-modal");
-    
-      modal.style.display = 'none';
-    }
-
-    function favorite(btn, id) {
-      const isPressed = btn.getAttribute('aria-pressed') === 'true';
-      if (isPressed) {
-          removeFromFavorites(id);
-      } else {
-          addToFavorites(id);
-      }
-
-      btn.setAttribute('aria-pressed', !isPressed);
-    }
-
-    function addToFavorites(id) {
-      const favs = JSON.parse(localStorage.getItem("favorites")) || []
-      favs.push(id.toString())
-      console.log(favs)
-      localStorage.setItem("favorites", JSON.stringify(favs))
-    }
-
-    function removeFromFavorites(id) {
-      const favs = JSON.parse(localStorage.getItem("favorites")) || []
-      const updated = favs.filter(ids => ids !== id.toString())
-      
-      console.log(updated)
-      localStorage.setItem("favorites", JSON.stringify(updated))
     }
   </script>
 

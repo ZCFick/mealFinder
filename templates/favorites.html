@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Favorites</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="{{ url_for('home') }}">Search</a>
+    <a href="{{ url_for('favorites_page') }}">Favorites</a>
+  </nav>
+
+  <div id="recipe-modal" class="modal-hidden">
+  
+    <div class="modal-content">
+      
+      <div id="modal-body">
+      </div>
+
+    </div>
+
+  </div>
+
+  <h1>My Favorite Meals</h1>
+  <div id="favorites-results"></div>
+
+  <script src="{{ url_for('static', filename='utils.js') }}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", loadFavorites);
+
+    async function loadFavorites() {
+      const container = document.getElementById("favorites-results");
+      container.replaceChildren();
+
+      const favoriteIds = JSON.parse(localStorage.getItem("favorites")) || [];
+
+      if (favoriteIds.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent = "No favorites yet. Go add some from Search.";
+        container.appendChild(empty);
+        return;
+      }
+
+      const meals = await Promise.all(
+        favoriteIds.map(async (id) => {
+          const res = await fetch(`/recipe/${id}`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          return { id, ...data };
+        })
+      );
+
+      meals.filter(Boolean).forEach(renderFavoriteCard);
+    }
+
+    function renderFavoriteCard(meal) {
+      const container = document.getElementById("favorites-results");
+
+      const card = document.createElement("div");
+      card.className = "mealCard";
+
+      const img = document.createElement("img");
+      img.src = meal.image;
+      img.alt = `${meal.name} image`;
+
+      const content = document.createElement("div");
+      content.className = "cardContent";
+
+      const title = document.createElement("h3");
+      title.textContent = `${meal.name} (${meal.location})`;
+
+      const viewBtn = document.createElement("button");
+      viewBtn.textContent = "View Recipe";
+      viewBtn.addEventListener("click", () => openRecipe(meal.id));
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Remove Favorite";
+      removeBtn.addEventListener("click", () => {
+        removeFromFavorites(meal.id);
+        loadFavorites();
+      });
+
+      content.appendChild(title);
+      content.appendChild(viewBtn);
+      content.appendChild(removeBtn);
+
+      card.appendChild(img);
+      card.appendChild(content);
+
+      container.appendChild(card);
+    }
+  </script>
+</body>
+</html>
